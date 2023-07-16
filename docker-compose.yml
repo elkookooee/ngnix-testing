@@ -1,26 +1,29 @@
-version: '3.8'
+version: "3"
 services:
-  wordpress:
-    build:
-      context: https://github.com/WordPress/wordpress-develop.git
-      dockerfile: Dockerfile
-    ports:
-      - 80:80
-    volumes:
-      - ./wp-content:/var/www/html/wp-content
-    environment:
-      WORDPRESS_DB_HOST: db
-      WORDPRESS_DB_USER: wordpress
-      WORDPRESS_DB_PASSWORD: password
-      WORDPRESS_DB_NAME: wordpress
-  db:
-    image: mysql:5.7
-    volumes:
-      - db_data:/var/lib/mysql
-    environment:
-      MYSQL_ROOT_PASSWORD: root_password
-      MYSQL_DATABASE: wordpress
-      MYSQL_USER: wordpress
-      MYSQL_PASSWORD: password
+database:
+image: mysql
+restart: always
+environment:
+MYSQL_ROOT_PASSWORD: wppassword
+MYSQL_DATABASE: wpdb
+MYSQL_USER: wpuser
+MYSQL_PASSWORD: wppassword
 volumes:
-  db_data:
+- mysql:/var/lib/mysql
+ 
+wordpress:
+depends_on:
+- database
+image: wordpress:latest
+restart: always
+ports:
+- "8021:80"
+environment:
+WORDPRESS_DB_HOST: database:3306
+WORDPRESS_DB_USER: wpuser
+WORDPRESS_DB_PASSWORD: wppassword
+WORDPRESS_DB_NAME: wpdb
+ 
+volumes:
+["./:/var/www/html"]
+volumes:
